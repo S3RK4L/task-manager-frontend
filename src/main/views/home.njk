@@ -1,4 +1,6 @@
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% extends "template.njk" %}
 
@@ -6,115 +8,37 @@
 but ultimately it is up to you -->
 
 {% block content %}
-  <h1 class="govuk-heading-xl">Welcome to your dev test!</h1>
+  <h1 class="govuk-heading-xl">Task Manager</h1>
 
   <!-- The freedom is yours. You can design the solution however you like, however there is a starting point provided
   to ensure you have both services running. You may want to make use of the Gov UK Components:
   https://design-system.service.gov.uk/components/ to add tabs and so forth :) -->
 
-  {% if example.id %}
+  {% if tasks and tasks.length > 0 %}
 
-    {{ govukSummaryList({
-      rows: [
-        {
-          key: {
-            text: "ID"
-          },
-          value: {
-            text: example.id
-          },
-          actions: {
-            items: [
-              {
-                href: "#",
-                text: "Change",
-                visuallyHiddenText: "change case id ?!"
-              }
-            ]
-          }
-        },
-        {
-          key: {
-            text: "Case Number"
-          },
-          value: {
-            text: example.caseNumber
-          },
-          actions: {
-            items: [
-              {
-                href: "#",
-                text: "Change",
-                visuallyHiddenText: "change case number"
-              }
-            ]
-          }
-        },
-        {
-          key: {
-            text: "Title"
-          },
-          value: {
-            html: example.title
-          },
-          actions: {
-            items: [
-              {
-                href: "#",
-                text: "Change",
-                visuallyHiddenText: "change case title"
-              }
-            ]
-          }
-        },
-        {
-          key: {
-            text: "Description"
-          },
-          value: {
-            html: example.description
-          },
-          actions: {
-            items: [
-               {
-                 href: "#",
-                 text: "Delete",
-                 visuallyHiddenText: "Delete description"
-               },
-               {
-                 href: "#",
-                 text: "Change",
-                 visuallyHiddenText: "Change description"
-               }
-            ]
-          }
-        },
-        {
-          key: {
-            text: "Status"
-          },
-          value: {
-            html: example.status
-          },
-          actions: {
-            items: [
-            ]
-          }
-        },
-        {
-          key: {
-           text: "Created Date"
-          },
-          value: {
-           html: example.createdDate
-          },
-          actions: {
-           items: [
-           ]
-          }
-        }
-      ]
-    }) }}
+  {% set taskRows = [] %}
+  {% for task in tasks %}
+    {% set taskRows = (taskRows.push([
+      { text: task.title },
+      { text: task.status },
+      { text: task.dueDateFormatted }
+    ]), taskRows) %}
+  {% endfor %}
+
+  {{ govukTable({
+    caption: "Tasks",
+    captionClasses: "govuk-table__caption--m",
+    firstCellIsHeader: true,
+    head: [
+      { text: "Title" },
+      { text: "Status" },
+      { text: "Due date" }
+    ],
+    rows: taskRows
+  }) }}
+
+  {% else %}
+  <p class="govuk-body govuk-hint">You have no tasks yet.</p>
 
   {% endif %}
 
