@@ -34,7 +34,7 @@
                 text: "Status"
             },
             value: {
-                text: task.status
+                html: '<strong class="govuk-tag ' + task.statusDisplay.tagClass + '">' + task.statusDisplay.label + '</strong>'
             }
         },
         {

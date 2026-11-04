@@ -11,15 +11,22 @@ function formatDueDate(dueDate: string): string {
   return `${date} at ${time}`;
 }
 
+const STATUS_DISPLAY: Record<string, { label: string; tagClass: string }> = {
+  TODO: { label: 'To do', tagClass: 'govuk-tag--grey' },
+  IN_PROGRESS: { label: 'In progress', tagClass: 'govuk-tag--blue' },
+  COMPLETED: { label: 'Completed', tagClass: 'govuk-tag--green' },
+};
+
 export default function (app: Application): void {
   app.get('/', async (req, res) => {
     try {
       const response = await axios.get(`${BACKEND_URL}/tasks`);
 
       // Keep the original dueDate for logic, and add a formatted version for display
-      const tasks = response.data.map((task: { dueDate: string }) => ({
+      const tasks = response.data.map((task: { dueDate: string; status: string }) => ({
         ...task,
         dueDateFormatted: formatDueDate(task.dueDate),
+        statusDisplay: STATUS_DISPLAY[task.status] || STATUS_DISPLAY.TODO,
       }));
 
       return res.render('home', { tasks });
@@ -56,7 +63,11 @@ export default function (app: Application): void {
   app.get('/tasks/:id', async (req, res) => {
     try {
       const response = await axios.get(`${BACKEND_URL}/tasks/${req.params.id}`);
-      const task = { ...response.data, dueDateFormatted: formatDueDate(response.data.dueDate) };
+      const task = {
+        ...response.data,
+        dueDateFormatted: formatDueDate(response.data.dueDate),
+        statusDisplay: STATUS_DISPLAY[response.data.status] || STATUS_DISPLAY.TODO,
+      };
       return res.render('task', { task });
     } catch (error) {
       if (error.response?.status === 404) {

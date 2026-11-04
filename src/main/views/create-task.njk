@@ -3,6 +3,7 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
 
 
 {% extends "template.njk" %}
@@ -34,13 +35,19 @@
             name: "description"
         }) }}
 
-        {{ govukInput({
-            label: {
-                text: "Status",
-                classes: "govuk-label--m"
+        {{ govukRadios({
+            name: "status",
+            fieldset: {
+            legend: {
+            text: "Status",
+            classes: "govuk-fieldset__legend--m"
+            }
             },
-            id: "status",
-            name: "status"
+            items: [
+            { value: "TODO", text: "To do", checked: true },
+            { value: "IN_PROGRESS", text: "In progress" },
+            { value: "COMPLETED", text: "Completed" }
+            ]
         }) }}
 
         {{ govukDateInput({
