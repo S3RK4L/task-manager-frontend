@@ -32,4 +32,28 @@ export default function (app: Application): void {
       res.render('home', {});
     }
   });
+
+  app.get('/tasks/new', (req, res) => {
+    res.render('create-task');
+  });
+
+  app.post('/tasks/new', async (req, res) => {
+    const { title, description, status } = req.body;
+    const day = req.body['dueDate-day'].padStart(2, '0');
+    const month = req.body['dueDate-month'].padStart(2, '0');
+    const year = req.body['dueDate-year'];
+
+    try {
+      await axios.post('http://localhost:4000/tasks', {
+        title,
+        description,
+        status,
+        dueDate: `${year}-${month}-${day}T${req.body.dueTime}:00`,
+      });
+      res.redirect('/');
+    } catch (error) {
+      console.error('Error creating task:', error);
+      res.render('create-task', { error: 'Failed to create task. Please try again.' });
+    }
+  });
 }

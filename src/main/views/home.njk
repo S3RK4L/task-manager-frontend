@@ -8,11 +8,17 @@
 but ultimately it is up to you -->
 
 {% block content %}
-  <h1 class="govuk-heading-xl">Task Manager</h1>
+  <h1 class="govuk-heading-xl">Task manager</h1>
 
   <!-- The freedom is yours. You can design the solution however you like, however there is a starting point provided
   to ensure you have both services running. You may want to make use of the Gov UK Components:
   https://design-system.service.gov.uk/components/ to add tabs and so forth :) -->
+
+  {{ govukButton({
+    text: "Add Task",
+    href: "/tasks/new"
+  }) }}
+
 
   {% if tasks and tasks.length > 0 %}
 
@@ -38,7 +44,7 @@ but ultimately it is up to you -->
   }) }}
 
   {% else %}
-  <p class="govuk-body govuk-hint">You have no tasks yet.</p>
+  <p class="govuk-body govuk-hint">You have no tasks yet. To add a task, please click the "Add task" button.</p>
 
   {% endif %}
 

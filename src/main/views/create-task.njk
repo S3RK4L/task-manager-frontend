@@ -1,0 +1,82 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+
+
+{% extends "template.njk" %}
+
+{% block content %}
+    {{ govukBackLink({
+        text: "Back",
+        href: "/"
+    }) }}
+    <h1 class="govuk-heading-xl">Create a task</h1>
+
+    <form method="POST" action="/tasks/new">
+
+        {{ govukInput({
+            label: {
+                text: "Title",
+                classes: "govuk-label--m"
+            },
+            id: "title",
+            name: "title"
+        }) }}
+
+        {{ govukTextarea({
+            label: {
+                text: "Description",
+                classes: "govuk-label--m"
+            },
+            id: "description",
+            name: "description"
+        }) }}
+
+        {{ govukInput({
+            label: {
+                text: "Status",
+                classes: "govuk-label--m"
+            },
+            id: "status",
+            name: "status"
+        }) }}
+
+        {{ govukDateInput({
+            id: "dueDate",
+            namePrefix: "dueDate",
+            fieldset: {
+                legend: {
+                text: "When is the task due?",
+                classes: "govuk-fieldset__legend--m"
+                }
+            },
+            hint: {
+                text: "For example, 27 3 2007"
+            }
+        }) }}
+
+        {{ govukInput({
+            label: {
+            text: "Due time",
+            classes: "govuk-label--m"
+            },
+            hint: {
+            text: "Use the 24-hour clock, for example 14:30"
+            },
+            id: "dueTime",
+            name: "dueTime",
+            classes: "govuk-input--width-5"
+        }) }}
+
+        <div class="govuk-button-group">
+            {{ govukButton({
+                text: "Save task"
+            }) }}
+            <a class="govuk-link" href="/">Cancel</a>
+        </div>
+
+    </form>
+
+{% endblock %}
