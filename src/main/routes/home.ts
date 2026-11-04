@@ -56,4 +56,26 @@ export default function (app: Application): void {
       res.render('create-task', { error: 'Failed to create task. Please try again.' });
     }
   });
+
+  app.get('/tasks/:id', async (req, res) => {
+    try {
+      // An example of connecting to the backend (a starting point)
+      const response = await axios.get(`http://localhost:4000/tasks/${req.params.id}`);
+
+      // Keeping the original task data and adding a new property for the formatted due date
+      // This way, you can use the original dueDate for any logic and the formatted version for display
+      const task = response.data;
+      const d = new Date(task.dueDate);
+      const date = new Intl.DateTimeFormat('en-GB', { dateStyle: 'long' }).format(d);
+      const time = new Intl.DateTimeFormat('en-GB', { timeStyle: 'short' }).format(d);
+      task.dueDateFormatted = `${date} at ${time}`;
+
+      res.render('task', { task });
+    } catch (error) {
+      console.error('Error making request:', error);
+      if (error.response?.status === 404) {
+        return res.status(404).render('not-found');
+      }
+    }
+  });
 }

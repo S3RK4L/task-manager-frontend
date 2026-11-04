@@ -1,0 +1,53 @@
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+
+{% extends "template.njk" %}
+
+{% block content %}
+    {{ govukBackLink({
+        text: "Back",
+        href: "/"
+    }) }}
+    <h1 class="govuk-heading-xl">{{ task.title }}</h1>
+
+    
+
+    {{ govukSummaryList({
+    rows: [
+        {
+            key: {
+                text: "Title"
+            },
+            value: {
+                text: task.title
+            }
+        },
+        {
+            key: {
+                text: "Description"
+            },
+            value: {
+                html: (task.description | escape) if task.description else '<span class="app-empty-value">No description</span>'
+            }
+        },
+        {
+            key: {
+                text: "Status"
+            },
+            value: {
+                text: task.status
+            }
+        },
+        {
+            key: {
+                text: "Due date"
+            },
+            value: {
+                text: task.dueDateFormatted
+            }
+        }
+    ]
+    }) }}
+
+{% endblock %}

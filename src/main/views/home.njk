@@ -25,7 +25,7 @@ but ultimately it is up to you -->
   {% set taskRows = [] %}
   {% for task in tasks %}
     {% set taskRows = (taskRows.push([
-      { text: task.title },
+      { html: '<a class="govuk-link" href="/tasks/' + task.id + '">' + task.title + '</a>' },
       { text: task.status },
       { text: task.dueDateFormatted }
     ]), taskRows) %}
