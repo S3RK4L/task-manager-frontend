@@ -27,7 +27,7 @@ but ultimately it is up to you -->
     {% set taskRows = (taskRows.push([
       { html: '<a class="govuk-link" href="/tasks/' + task.id + '">' + (task.title | escape) + '</a>' },
       { html: '<strong class="govuk-tag ' + task.statusDisplay.tagClass + '">' + task.statusDisplay.label + '</strong>' },
-      { text: task.dueDateFormatted }
+      { html: task.dueDateFormatted + (' <strong class="govuk-tag govuk-tag--red">Overdue</strong>' if task.isOverdue else '') }
     ]), taskRows) %}
   {% endfor %}
 

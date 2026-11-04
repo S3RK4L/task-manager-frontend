@@ -17,6 +17,11 @@ const STATUS_DISPLAY: Record<string, { label: string; tagClass: string }> = {
   COMPLETED: { label: 'Completed', tagClass: 'govuk-tag--green' },
 };
 
+// A task is overdue once its due date has passed, unless it has already been completed
+function isOverdue(dueDate: string, status: string): boolean {
+  return status !== 'COMPLETED' && new Date(dueDate).getTime() < Date.now();
+}
+
 export default function (app: Application): void {
   app.get('/', async (req, res) => {
     try {
@@ -27,6 +32,7 @@ export default function (app: Application): void {
         ...task,
         dueDateFormatted: formatDueDate(task.dueDate),
         statusDisplay: STATUS_DISPLAY[task.status] || STATUS_DISPLAY.TODO,
+        isOverdue: isOverdue(task.dueDate, task.status),
       }));
 
       return res.render('home', { tasks });
@@ -67,6 +73,7 @@ export default function (app: Application): void {
         ...response.data,
         dueDateFormatted: formatDueDate(response.data.dueDate),
         statusDisplay: STATUS_DISPLAY[response.data.status] || STATUS_DISPLAY.TODO,
+        isOverdue: isOverdue(response.data.dueDate, response.data.status),
       };
       return res.render('task', { task });
     } catch (error) {

@@ -50,7 +50,7 @@
                 text: "Due date"
             },
             value: {
-                text: task.dueDateFormatted
+                html: task.dueDateFormatted + (' <strong class="govuk-tag govuk-tag--red">Overdue</strong>' if task.isOverdue else '')
             }
         }
     ]
