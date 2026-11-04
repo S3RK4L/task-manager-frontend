@@ -1,13 +1,37 @@
-# HMCTS Dev Test Frontend
+# Task Manager Frontend
 
-This will be the frontend for the brand new HMCTS case management system. As a potential candidate we are leaving
-this in your hands. Please refer to the brief for the complete list of tasks! Complete as much as you can and be
-as creative as you want.
+GOV.UK-styled frontend for the Task Manager API. Caseworkers can create tasks, view them, update their status and delete them.
 
-To begin with, you should be able to run this by running:
+## Running locally
 
-1. `yarn install`
-2. `yarn webpack`
-3. `yarn start:dev` or navigate to package.json and run the script manually
+Start the backend first, as described in its README.
 
-You can change the structure however you like!
+```
+yarn install
+yarn build
+yarn start:dev
+```
+
+Runs on `https://localhost:3100`. The local certificate is self-signed, so your browser will warn you.
+
+Set `BACKEND_URL` to point at something other than `http://localhost:4000`.
+
+## Tests and checks
+
+```
+yarn cichecks
+```
+
+Install, build, lint and tests — the same command CI runs. The route tests use supertest with axios mocked, so they run without the backend:
+
+```
+yarn test:routes
+```
+
+## Changes to the starter
+
+Yarn is on the `node-modules` linker because the Nunjucks watcher couldn't resolve `chokidar` under PnP — the CI workflow has a matching install step. The Express error handler was also missing its fourth `next` parameter, so errors were being swallowed.
+
+## Notes
+
+I used AI as a learning aid while building this, mainly for debugging and GOV.UK component syntax. All code was written and reviewed by me.
