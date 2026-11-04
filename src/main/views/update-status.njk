@@ -1,0 +1,32 @@
+{% extends "template.njk" %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block content %}
+    {{ govukBackLink({ text: "Back", href: "/tasks/" + task.id }) }}
+
+    <form method="post" action="/tasks/{{ task.id }}/status" novalidate>
+        {{ govukRadios({
+        name: "status",
+        fieldset: {
+        legend: {
+        text: "Update status",
+        isPageHeading: true,
+        classes: "govuk-fieldset__legend--l"
+        }
+        },
+        hint: { text: task.title },
+        items: [
+        { value: "TODO", text: "To do", checked: task.status == "TODO" },
+        { value: "IN_PROGRESS", text: "In progress", checked: task.status == "IN_PROGRESS" },
+        { value: "COMPLETED", text: "Completed", checked: task.status == "COMPLETED" }
+        ]
+        }) }}
+
+        <div class="govuk-button-group">
+            {{ govukButton({ text: "Save status" }) }}
+            <a class="govuk-link" href="/tasks/{{ task.id }}">Cancel</a>
+        </div>
+    </form>
+{% endblock %}

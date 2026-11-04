@@ -78,6 +78,32 @@ export default function (app: Application): void {
     }
   });
 
+  app.get('/tasks/:id/status', async (req, res) => {
+    try {
+      const response = await axios.get(`${BACKEND_URL}/tasks/${req.params.id}`);
+      return res.render('update-status', { task: response.data });
+    } catch (error) {
+      if (error.response?.status === 404) {
+        return res.status(404).render('not-found');
+      }
+      console.error('Error loading task:', error);
+      return res.status(500).render('error', { message: 'Failed to fetch task. Please try again.' });
+    }
+  });
+
+  app.post('/tasks/:id/status', async (req, res) => {
+    try {
+      await axios.patch(`${BACKEND_URL}/tasks/${req.params.id}`, { status: req.body.status });
+      return res.redirect(`/tasks/${req.params.id}`);
+    } catch (error) {
+      if (error.response?.status === 404) {
+        return res.status(404).render('not-found');
+      }
+      console.error('Error updating status:', error);
+      return res.status(500).render('error', { message: 'Failed to update status. Please try again.' });
+    }
+  });
+
   app.get('/tasks/:id/delete', async (req, res) => {
     try {
       const response = await axios.get(`${BACKEND_URL}/tasks/${req.params.id}`);

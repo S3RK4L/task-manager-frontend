@@ -35,6 +35,14 @@
             },
             value: {
                 html: '<strong class="govuk-tag ' + task.statusDisplay.tagClass + '">' + task.statusDisplay.label + '</strong>'
+            },
+            actions: {
+                items: [
+                    {
+                        href: "/tasks/" + task.id + "/status",
+                        text: "Change"
+                    }
+                ]
             }
         },
         {
