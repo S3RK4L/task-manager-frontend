@@ -1,6 +1,6 @@
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-
+{% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% extends "template.njk" %}
 
@@ -10,8 +10,6 @@
         href: "/"
     }) }}
     <h1 class="govuk-heading-xl">{{ task.title }}</h1>
-
-    
 
     {{ govukSummaryList({
     rows: [
@@ -48,6 +46,12 @@
             }
         }
     ]
+    }) }}
+
+    {{ govukButton({
+    text: "Delete task",
+    classes: "govuk-button--warning",
+    href: "/tasks/" + task.id + "/delete"
     }) }}
 
 {% endblock %}

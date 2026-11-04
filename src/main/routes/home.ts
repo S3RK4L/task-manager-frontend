@@ -1,35 +1,31 @@
 import axios from 'axios';
 import { Application } from 'express';
 
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:4000';
+
+// Formats an ISO date string as GOV.UK style, for example "10 November 2026 at 09:00"
+function formatDueDate(dueDate: string): string {
+  const d = new Date(dueDate);
+  const date = new Intl.DateTimeFormat('en-GB', { dateStyle: 'long' }).format(d);
+  const time = new Intl.DateTimeFormat('en-GB', { timeStyle: 'short' }).format(d);
+  return `${date} at ${time}`;
+}
+
 export default function (app: Application): void {
   app.get('/', async (req, res) => {
-    // try {
-    //   // An example of connecting to the backend (a starting point)
-    //   const response = await axios.get('http://localhost:4000/get-example-case');
-    //   console.log(response.data);
-    //   res.render('home', { example: response.data });
-    // } catch (error) {
-    //   console.error('Error making request:', error);
-    //   res.render('home', {});
-    // }
-
     try {
-      // An example of connecting to the backend (a starting point)
-      const response = await axios.get('http://localhost:4000/tasks');
-      console.log(response.data);
+      const response = await axios.get(`${BACKEND_URL}/tasks`);
 
-      // Keeping the original task data and adding a new property for the formatted due date
-      // This way, you can use the original dueDate for any logic and the formatted version for display
-      const tasks = response.data.map((task: { dueDate: string | number | Date }) => {
-        const d = new Date(task.dueDate);
-        const date = new Intl.DateTimeFormat('en-GB', { dateStyle: 'long' }).format(d);
-        const time = new Intl.DateTimeFormat('en-GB', { timeStyle: 'short' }).format(d);
-        return { ...task, dueDateFormatted: `${date} at ${time}` };
-      });
-      res.render('home', { tasks });
+      // Keep the original dueDate for logic, and add a formatted version for display
+      const tasks = response.data.map((task: { dueDate: string }) => ({
+        ...task,
+        dueDateFormatted: formatDueDate(task.dueDate),
+      }));
+
+      return res.render('home', { tasks });
     } catch (error) {
-      console.error('Error making request:', error);
-      res.render('home', {});
+      console.error('Error loading tasks:', error);
+      return res.status(500).render('error', { message: 'Failed to load tasks. Please try again.' });
     }
   });
 
@@ -38,44 +34,62 @@ export default function (app: Application): void {
   });
 
   app.post('/tasks/new', async (req, res) => {
-    const { title, description, status } = req.body;
+    const { title, description, status, dueTime } = req.body;
     const day = req.body['dueDate-day'].padStart(2, '0');
     const month = req.body['dueDate-month'].padStart(2, '0');
     const year = req.body['dueDate-year'];
 
     try {
-      await axios.post('http://localhost:4000/tasks', {
+      await axios.post(`${BACKEND_URL}/tasks`, {
         title,
         description,
         status,
-        dueDate: `${year}-${month}-${day}T${req.body.dueTime}:00`,
+        dueDate: `${year}-${month}-${day}T${dueTime}:00`,
       });
-      res.redirect('/');
+      return res.redirect('/');
     } catch (error) {
       console.error('Error creating task:', error);
-      res.render('create-task', { error: 'Failed to create task. Please try again.' });
+      return res.render('create-task', { error: 'Failed to create task. Please try again.' });
     }
   });
 
   app.get('/tasks/:id', async (req, res) => {
     try {
-      // An example of connecting to the backend (a starting point)
-      const response = await axios.get(`http://localhost:4000/tasks/${req.params.id}`);
-
-      // Keeping the original task data and adding a new property for the formatted due date
-      // This way, you can use the original dueDate for any logic and the formatted version for display
-      const task = response.data;
-      const d = new Date(task.dueDate);
-      const date = new Intl.DateTimeFormat('en-GB', { dateStyle: 'long' }).format(d);
-      const time = new Intl.DateTimeFormat('en-GB', { timeStyle: 'short' }).format(d);
-      task.dueDateFormatted = `${date} at ${time}`;
-
-      res.render('task', { task });
+      const response = await axios.get(`${BACKEND_URL}/tasks/${req.params.id}`);
+      const task = { ...response.data, dueDateFormatted: formatDueDate(response.data.dueDate) };
+      return res.render('task', { task });
     } catch (error) {
-      console.error('Error making request:', error);
       if (error.response?.status === 404) {
         return res.status(404).render('not-found');
       }
+      console.error('Error loading task:', error);
+      return res.status(500).render('error', { message: 'Failed to fetch task. Please try again.' });
+    }
+  });
+
+  app.get('/tasks/:id/delete', async (req, res) => {
+    try {
+      const response = await axios.get(`${BACKEND_URL}/tasks/${req.params.id}`);
+      return res.render('delete-task', { task: response.data });
+    } catch (error) {
+      if (error.response?.status === 404) {
+        return res.status(404).render('not-found');
+      }
+      console.error('Error loading task:', error);
+      return res.status(500).render('error', { message: 'Failed to fetch task. Please try again.' });
+    }
+  });
+
+  app.post('/tasks/:id/delete', async (req, res) => {
+    try {
+      await axios.delete(`${BACKEND_URL}/tasks/${req.params.id}`);
+      return res.redirect('/');
+    } catch (error) {
+      if (error.response?.status === 404) {
+        return res.status(404).render('not-found');
+      }
+      console.error('Error deleting task:', error);
+      return res.status(500).render('error', { message: 'Failed to delete task. Please try again.' });
     }
   });
 }
